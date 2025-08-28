@@ -1,0 +1,116 @@
+volumes:
+  postgres-data:
+    driver: local
+  kestra-data:
+    driver: local
+
+services:
+  # postgres:
+  #   image: postgres
+  #   volumes:
+  #     - postgres-data:/var/lib/postgresql/data
+  #   environment:
+  #     POSTGRES_DB: kestra
+  #     POSTGRES_USER: kestra
+  #     POSTGRES_PASSWORD: k3str4
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 10
+
+  # kestra:
+  #   image: kestra/kestra:latest
+  #   user: "root"
+  #   command: server standalone
+  #   volumes:
+  #     - kestra-data:/app/storage
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - /tmp/kestra-wd:/tmp/kestra-wd
+  #   environment:
+  #     KESTRA_CONFIGURATION: |
+  #       datasources:
+  #         postgres:
+  #           url: jdbc:postgresql://postgres:5432/kestra
+  #           driverClassName: org.postgresql.Driver
+  #           username: kestra
+  #           password: k3str4
+  #       kestra:
+  #         repository:
+  #           type: postgres
+  #         storage:
+  #           type: local
+  #           local:
+  #             basePath: "/app/storage"
+  #         queue:
+  #           type: postgres
+  #         tasks:
+  #           tmpDir:
+  #             path: /tmp/kestra-wd/tmp
+  #         url: http://localhost:8080/
+  #   ports:
+  #     - "8080:8080"
+  #     - "8081:8081"
+  #   depends_on:
+  #     postgres:
+  #       condition: service_started
+
+  # kafka:
+  #   image: confluentinc/cp-kafka:latest
+  #   hostname: kafka
+  #   container_name: kafka_observability
+  #   ports:
+  #     - "9092:9092"
+  #     - "9093:9093"
+  #   environment:
+  #     KAFKA_KRAFT_MODE: "true"
+  #     KAFKA_PROCESS_ROLES: controller,broker
+  #     KAFKA_NODE_ID: 1
+  #     KAFKA_CONTROLLER_QUORUM_VOTERS: "1@localhost:9093" 
+  #     KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+  #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+  #     KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+  #     KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+  #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka_observability:9092
+  #     KAFKA_LOG_DIRS: /var/lib/kafka/data 
+  #     KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true" 
+  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 
+  #     KAFKA_LOG_RETENTION_HOURS: 168  
+  #     KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0 
+  #     CLUSTER_ID: "Mk3OEYBSD34fcwNTJENDM2Qk"  
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - ./data:/var/lib/kafka/data 
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "nc -z localhost 9092 || exit 1"]
+  #     interval: 10s
+  #     timeout: 10s
+  #     retries: 5
+
+  qdrant:
+    image: qdrant/qdrant
+    container_name: qdrant_container
+    restart: unless-stopped
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - ./qdrant_data:/qdrant/storage
+
+  # vector:
+    # container_name: vector
+    # image: timberio/vector:0.48.0-debian
+    # ports:
+    #   - "8686:8686"
+    # volumes:
+    #   - ./vector.yaml:/etc/vector/vector.yaml:ro
+    #   - .:/app
+    # restart: on-failure
+    # logging:
+    #   driver: "json-file"
+    #   options:
+    #     max-size: "10m"
+    #     max-file: "3"
+    # depends_on: 
+    #   kafka:
+    #     condition: service_healthy

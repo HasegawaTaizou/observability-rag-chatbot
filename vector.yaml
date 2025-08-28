@@ -1,0 +1,24 @@
+api:
+  enabled: true
+  address: 0.0.0.0:8686
+sources:
+  my_logs:
+    type: file
+    include:
+      - /app/my_app_logs.log
+sinks:
+  kafka_sink:
+    type: kafka
+    inputs:
+      - my_logs
+    bootstrap_servers: "kafka:9092"
+    topic: "app-logs"
+    encoding:
+      codec: json
+  console_output:
+    type: console
+    inputs:
+      - my_logs
+    encoding:
+      codec: json
+

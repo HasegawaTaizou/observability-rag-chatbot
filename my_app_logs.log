@@ -1,0 +1,10 @@
+2023-10-27T10:00:01Z [INFO] O usuário 'joao.silva' fez login com sucesso.
+2023-10-27T10:00:05Z [WARN] Tentativa de acesso não autorizada na rota '/admin' por 192.168.1.10.
+2023-10-27T10:00:10Z [ERROR] Falha ao conectar ao banco de dados: Erro de autenticação.
+2023-10-27T10:00:15Z [INFO] Processamento da fatura #12345 concluído em 150ms.
+2023-10-27T10:00:20Z [DEBUG] Dados da sessão do usuário: { "id": "uuid-12345", "role": "user" }.
+2023-10-27T10:00:25Z [WARN] O cache está cheio, limpando itens antigos.
+2023-10-27T10:00:30Z [INFO] Envio de e-mail de confirmação para 'maria.souza@email.com' bem-sucedido.
+2023-10-27T10:00:35Z [ERROR] Exceção não tratada: NullPointerException em 'processamentoDePedido'.
+2023-10-27T10:00:40Z [INFO] O servidor foi reiniciado com sucesso.
+2023-10-27T10:00:45Z [WARN] O limite de memória do aplicativo foi excedido (85%).

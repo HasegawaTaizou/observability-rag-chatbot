@@ -1,0 +1,44 @@
+id: shrew_244728
+namespace: company.team
+
+triggers:
+  - id: trigger_kafka
+    type: io.kestra.plugin.kafka.Trigger
+    topic: app-logs
+    properties:
+      bootstrap.servers: kafka_observability:9092
+      auto.offset.reset: earliest
+    groupId: console-consumer-38273
+
+tasks:
+  - id: pythonChunks
+    type: io.kestra.plugin.scripts.python.Commands
+    namespaceFiles:
+      enabled: true
+      include:
+        - create_chunks_script.py
+    taskRunner:
+      type: io.kestra.plugin.core.runner.Process
+    beforeCommands:
+      - pip install kestra
+      - pip install amazon.ion
+      - pip install langchain
+      - pip install langchain-core
+    commands:
+      - python create_chunks_script.py --text "{{trigger.uri}}"
+      
+  - id: pythonPopulateQdrant
+    type: io.kestra.plugin.scripts.python.Commands
+    namespaceFiles:
+      enabled: true
+      include:
+        - populate_qdrant_script.py
+    taskRunner:
+      type: io.kestra.plugin.core.runner.Process
+    beforeCommands:
+      - pip install langchain-core
+      - pip install langchain-community 
+      - pip install sentence-transformers 
+      - pip install qdrant-client
+    commands:
+      - python populate_qdrant_script.py --json_chunk '{{ outputs.pythonChunks.vars }}'
